@@ -7,6 +7,7 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [newProject, setNewProject] = useState({ name: "", client_id: "" });
+  const [projectNameError, setProjectNameError] = useState("");
 
   useEffect(() => {
     fetchProjects();
@@ -33,15 +34,20 @@ export default function App() {
     });
   }
 
-  function handleCreate(e) {
+  async function handleCreate(e) {
     e.preventDefault();
-    createProject({
-      name: newProject.name,
-      client_id: Number(newProject.client_id),
-    }).then(() => {
+    setProjectNameError("");
+
+    try {
+      await createProject({
+        name: newProject.name,
+        client_id: Number(newProject.client_id),
+      });
       setNewProject({ name: "", client_id: "" });
       fetchProjects();
-    });
+    } catch (err) {
+      setProjectNameError(err.message || "Failed to create project");
+    }
   }
 
   return (
@@ -54,14 +60,22 @@ export default function App() {
       <section className="new-project">
         <h2>Add Project</h2>
         <form onSubmit={handleCreate}>
-          <input
-            type="text"
-            placeholder="Project name"
-            value={newProject.name}
-            onChange={(e) =>
-              setNewProject({ ...newProject, name: e.target.value })
-            }
-          />
+          <div className="field-group">
+            <input
+              type="text"
+              placeholder="Project name"
+              value={newProject.name}
+              onChange={(e) => {
+                setProjectNameError("");
+                setNewProject({ ...newProject, name: e.target.value });
+              }}
+            />
+            {projectNameError ? (
+              <p className="field-error" role="alert">
+                {projectNameError}
+              </p>
+            ) : null}
+          </div>
           <select
             value={newProject.client_id}
             onChange={(e) =>
