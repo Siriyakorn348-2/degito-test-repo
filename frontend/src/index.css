@@ -35,6 +35,29 @@ form {
   align-items: flex-start;
 }
 
+.search-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0 16px;
+}
+
+.search-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+.search-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-controls input {
+  flex: 1;
+}
+
 input,
 select,
 button {
@@ -75,4 +98,10 @@ td {
 .field-error {
   color: red;
   font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #666;
+  padding: 18px 8px;
 }

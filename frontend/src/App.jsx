@@ -7,6 +7,7 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [newProject, setNewProject] = useState({ name: "", client_id: "" });
+  const [clientSearch, setClientSearch] = useState("");
   const [projectNameError, setProjectNameError] = useState("");
 
   useEffect(() => {
@@ -14,8 +15,8 @@ export default function App() {
     fetchClients();
   }, []);
 
-  function fetchProjects() {
-    getProjects().then(setProjects);
+  function fetchProjects(searchTerm = "") {
+    getProjects(searchTerm).then(setProjects);
   }
 
   function fetchClients() {
@@ -44,10 +45,20 @@ export default function App() {
         client_id: Number(newProject.client_id),
       });
       setNewProject({ name: "", client_id: "" });
-      fetchProjects();
+      fetchProjects(clientSearch);
     } catch (err) {
       setProjectNameError(err.message || "Failed to create project");
     }
+  }
+
+  function handleSearch(e) {
+    e.preventDefault();
+    fetchProjects(clientSearch);
+  }
+
+  function handleClearSearch() {
+    setClientSearch("");
+    fetchProjects("");
   }
 
   return (
@@ -95,6 +106,22 @@ export default function App() {
 
       <section className="project-list">
         <h2>Projects</h2>
+        <form className="search-row" onSubmit={handleSearch}>
+          <label htmlFor="client-search">Search by client name</label>
+          <div className="search-controls">
+            <input
+              id="client-search"
+              type="text"
+              placeholder="Type a client name"
+              value={clientSearch}
+              onChange={(e) => setClientSearch(e.target.value)}
+            />
+            <button type="submit">Search</button>
+            <button type="button" onClick={handleClearSearch}>
+              Clear
+            </button>
+          </div>
+        </form>
         <table>
           <thead>
             <tr>
@@ -129,6 +156,13 @@ export default function App() {
                 </td>
               </tr>
             ))}
+            {projects.length === 0 && clientSearch.trim() !== "" ? (
+              <tr>
+                <td className="empty-state" colSpan="3">
+                  No projects found.
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </section>

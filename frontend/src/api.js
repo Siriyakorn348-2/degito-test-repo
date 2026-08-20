@@ -15,8 +15,13 @@ async function request(path, options = {}) {
   return data;
 }
 
-export function getProjects() {
-  return request("/api/projects");
+export function getProjects(clientName = "") {
+  // ส่งคำค้นไป API
+  const query = clientName.trim()
+    ? `?client_name=${encodeURIComponent(clientName.trim())}`
+    : "";
+
+  return request(`/api/projects${query}`);
 }
 
 export function getClients() {

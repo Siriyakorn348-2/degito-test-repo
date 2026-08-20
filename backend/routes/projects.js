@@ -7,6 +7,16 @@ const router = express.Router();
 // Returns all projects with their client name.
 router.get("/", async (req, res) => {
   try {
+    const { client_name } = req.query;
+    const params = [];
+    let whereClause = "";
+
+    if (client_name && String(client_name).trim() !== "") {
+      // กรองตามชื่อลูกค้า
+      params.push(`%${String(client_name).trim()}%`);
+      whereClause = `WHERE c.name ILIKE $1`;
+    }
+
     const result = await pool.query(`
       SELECT
         p.id,
@@ -16,8 +26,9 @@ router.get("/", async (req, res) => {
         c.name AS client_name
       FROM projects p
       JOIN clients c ON c.id = p.client_id
+      ${whereClause}
       ORDER BY p.id ASC
-    `);
+    `, params);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
